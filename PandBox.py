@@ -1,17 +1,45 @@
-from tokenize import Double
 import numpy as np
 import matplotlib.pyplot as plt
 from tkinter import *
-from matplotlib import cm
-import matplotlib
-from matplotlib.figure import Figure
-from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, 
-NavigationToolbar2Tk)
-from matplotlib.ticker import MultipleLocator
-import math
-#from pyparsing import PositionToken
-from scipy import integrate
+import string
+import random
 
+class ResolutionNode():
+    def __init__(self, variables, parent, child):
+        self.variables = variables
+        self.parent = parent
+        self.child = child
+
+class ResolutionGraph():
+    def __init__(self):
+        self.tree_nodes = []
+
+    def addNode(self, variables, parent, child, level):
+        if len(self.tree_nodes) < level:
+            self.tree_nodes.append([])
+        self.tree_nodes[level].append(ResolutionNode(variables, parent, child))
+
+
+class LogicalProblem():
+    def __init__(self, num_variables, num_premises, num_complexity, validity):
+        possible_variables = list(string.ascii_uppercase)
+        self.num_variables = num_variables
+        self.variables = possible_variables[0:num_variables]
+        self.num_premises = num_premises
+        self.premises = []
+        self.num_complexity = num_complexity
+        self.validity = validity
+
+        self.resolution_tree = []
+    
+    def generate_random(self):
+        if self.validity:
+            self.resolution_tree.append([])
+        else:
+            temp = []
+            for i in range(random.randint(1:self.num_variables)):
+                temp.append()
+            self.resolution_tree.append()
 
 
 
@@ -19,8 +47,15 @@ from scipy import integrate
 class Main_Application():
     def __init__(self, master):
         self.master = master
-        self.nothing = ''
-        
+
+
+        self.initiate_gui()
+        self.draw()
+
+    def doNothing(self):
+        return
+
+    def initiate_gui(self):
         self.master.columnconfigure(1, weight =1, minsize=150)
         self.master.columnconfigure(2, weight =1, minsize=150)
         self.master.columnconfigure(3, weight =1, minsize=150)
@@ -30,19 +65,18 @@ class Main_Application():
 
 
         # Make a text box to input values instead
-        self.variable_input = Spinbox(self.master, textvariable = "0.0", font=('helvetica', 20))
+        self.variable_input = Spinbox(self.master, from_ = 1, to = 100, font=('helvetica', 20))
         self.variable_input_label = Label(self.master, text = "# of Variables", font=('helvetica', 15))
 
         
         # Make a text box to input values instead
-        self.premise_input = Spinbox(self.master, textvariable = "0.0", font=('helvetica', 20))
+        self.premise_input = Spinbox(self.master, from_ = 1, to = 100, font=('helvetica', 20))
         self.premise_input_label = Label(self.master, text = "# of Premises", font=('helvetica', 15))
 
 
         # Make a textbox to change sizey
-        self.complexity_input = Spinbox(self.master, textvariable = self.nothing, font=('helvetica', 20))
+        self.complexity_input = Spinbox(self.master, from_ = 1, to = 100, font=('helvetica', 20))
         self.complexity_label = Label(self.master, text = "'Complexity'", font=('helvetica', 15))
-
 
         
         # Button to clear the potential
@@ -50,12 +84,6 @@ class Main_Application():
         
         # Button to clear the potential
         self.can_satisfy = Button(self.master, command = self.doNothing, text = "    ", font=('helvetica', 16))
-
-        self.draw()
-
-    def doNothing(self):
-        return
-
 
     def draw(self):
         
@@ -114,3 +142,8 @@ if __name__ == "__main__" :
     everything = Main_Application(app)
 
     app.mainloop()
+
+
+
+
+
