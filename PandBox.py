@@ -4,6 +4,7 @@ from tkinter import *
 import tkinter.font as tkFont
 import string
 import random
+import copy
 
 class Variable():
     def __init__(self, var_name, truthValue):
@@ -102,60 +103,67 @@ class LogicalProblem():
         return self.resolution_tree
     
     def generate_random(self):
+        used_vars = [] # List to keep track of what variables we have used so far in this tree
+        num_splits_left = 2**self.num_complexity - 1
         if self.num_variables < self.num_complexity:
             print("Too little variables for this complexity.")
             return
         if self.validity:
-            self.resolution_tree.addNode([], (-1, 0), -1, 0) # If valid then we start with an empty node
+            self.resolution_tree.addNode([], (-1, -1), -1, 0) # If valid then we start with an empty node
         else:
             if self.num_variables == self.num_complexity:
                 print("Too little variables for this complexity for a non-valid problem.")
                 return
-            self.resolution_tree.addNode(random.sample(self.variables, random.randint(1, self.num_variables - self.num_complexity)), (-1, 0), -1, 0) # If not valid then we start with a node with stuff in it
+            init_var = random.sample(self.variables, random.randint(max(1, self.num_variables - num_splits_left), self.num_variables - self.num_complexity))
+            used_vars = copy.deepcopy(init_var)
+            self.resolution_tree.addNode(init_var, (-1, -1), -1, 0) # If not valid then we start with a node with stuff in it
 
         all_var_used = False
         # Just temporary set the number of levels of the tree to the complexity so we loop and generate new branches until we get num_complexity levels
-        while self.resolution_tree.numLevels() < self.num_complexity or not all_var_used:
+        while self.resolution_tree.numLevels() <= self.num_complexity or not all_var_used:
             # Double for loop to loop through every node in the 'tree'
-            used_vars = self.variables.copy()
             for i in range(self.resolution_tree.numLevels()):
                 for j in range(self.resolution_tree.levelSize(i)):
                     current_node = self.resolution_tree.getNode(i,j) # Just to say what the current node is
-                    for v in range(len(current_node.getVariables())):
-                        for used_v in range(len(used_vars)):
-                            if current_node.getVariables()[v].getVariable() == used_vars[used_v].getVariable():
-                                del used_vars[used_v]
-                                break
-                    if len(used_vars) == 0:
+                    current_node.printNode()
+                    print("")
+                    if len(used_vars) == len(self.variables):
                         all_var_used = True
+
                     if current_node.getParent()[0] == -1 and random.random() < 0.5 and i < self.num_complexity: # If this node has no parents and we git a coin toss then split on this node
                         possibleVar = [] # List of possible variables to split into
+                        for var in self.variables: # Get a list of variables that we could split with
+                            in_node = False # To tell if the variable is in the node
+                            if num_splits_left <= (self.num_variables - len(used_vars)): # If we don't have enough splits left for the number of variables then we must choose variables to split from that we havn't used yet
+                                for v in range(len(used_vars)): # Loop through all the used variables
+                                    if used_vars[v].getVariable() == var.getVariable(): # If the current var from the total list of variables is already used then say its in the node
+                                        in_node = True
+                                
+                                if not in_node: # If its not in the node (therefore its not used yet) then append it to the possible vars we can split from
+                                    possibleVar.append(var)
+                            else: # If we do have enough splits left for the total number of variables then we can just split on any variable not in the node we are splitting off of
+                                for v in range(len(current_node.getVariables())): # Loop through all the variables in the node we are splitting from 
+                                    if current_node.getVariables()[v].getVariable() == var.getVariable(): # If the variable is in teh current node then set it to true
+                                        in_node = True
 
-                        for var in self.variables: # Get a list of variables that are not in the current node
-                            in_node = False
-                            for v in range(len(current_node.getVariables())):
-                                for used_v in range(len(used_vars)):
-                                    if current_node.getVariables()[v].getVariable() == used_vars[used_v].getVariable():
-                                        del used_vars[used_v]
-                                        break
-                                if current_node.getVariables()[v].getVariable() == var.getVariable():
-                                    in_node = True
-
-                            if not in_node:
-                                possibleVar.append(var)
-                        random_var = random.choice(possibleVar).getVariable() # Pick a random variable to add to the split onto the next level
-                        next_vars = current_node.getVariables().copy()
-                        temp = Variable(random_var, True)
-                        next_vars.append(temp)
+                                if not in_node: # If the variable is not in the current node then we can possibly split off of it
+                                    possibleVar.append(var)
+                        if len(possibleVar) == 0: # If the node already uses all the variables don't try to split
+                            continue
+                        random_var = random.choice(possibleVar) # Pick a random variable to add to the split onto the next level
+                        if random_var not in used_vars: # If the next random variable is not already used then add it to the used vars
+                            used_vars.append(random_var)
+                        next_vars = copy.deepcopy(current_node.getVariables())
+                        next_vars.append(Variable(random_var.getVariable(), True))
                         self.resolution_tree.addNode(next_vars, (-1,-1), j, i + 1) # Make the parent nodes each with the new random variable along with the variables form the node we split off oftemp = current_node.getVariables()
                         
-                        next_vars = current_node.getVariables().copy()
-                        temp = Variable(random_var, False)
-                        next_vars.append(temp)
+                        next_vars = copy.deepcopy(current_node.getVariables())
+                        next_vars.append(Variable(random_var.getVariable(), False))
                         self.resolution_tree.addNode(next_vars, (-1,-1), j, i + 1) # Also make the parents nothing and then give it its level and child
+
+                        num_splits_left -= 1
                         
                         current_node.changeParent((self.resolution_tree.levelSize(i + 1) - 2, self.resolution_tree.levelSize(i + 1) - 1)) # Set the node we split off of to have the correct parents
-
 
 
 # Main function for he whole application
@@ -164,6 +172,10 @@ class Main_Application():
         self.master = master
         self.problems = []
         self.valid = True
+        self.num_variables = StringVar()
+        self.num_variables.set('')
+        self.num_complexity = StringVar()
+        self.num_complexity.set('')
 
         self.initiate_gui() # Initate all the GUI elements
         self.draw() # Draw all the GUI elements to the window
@@ -205,7 +217,31 @@ class Main_Application():
             self.can_satisfy = Button(self.master, command = self.swapValidity, text = "    ", bg = 'red', font=('helvetica', 16))
             self.can_satisfy.grid(column=5, row=1, columnspan=1, pady=10)
 
-    def doNothing(self):
+    # Function to force the complexity to be within a certain range depending on the number of variables
+    def updateComplexity(self, a, b, c):
+        var_input = int(self.variable_input.get()) # Get the current number of variables
+        n = 0 # This will be the minimum complexity
+        S = 1 # Just a dummy
+        while var_input >= S: # While the number of variables is less than 2^n we add 1 to n
+            n += 1
+            S = 2**n
+        # All of the crap in this if statement below is just to make sure the UI doesnt let you have non-possible complexity values for any given number of variables if you want non-valid answers
+        if not self.valid: # If we want a non-valid problem we can have less complexity
+            n = 1
+            self.num_complexity.set(str(n)) # This is just resetting the complexity gui element to add the new min max
+            self.complexity_input.grid_forget()
+            if (var_input == 1):
+                self.complexity_input = Spinbox(self.master, from_ = n, to = 1, textvariable=self.num_complexity, font=('helvetica', 20))
+                self.complexity_input.grid(column = 4, row = 1, columnspan= 1, padx = 10, pady=10)
+            else:
+                self.complexity_input = Spinbox(self.master, from_ = n, to = var_input - 1, textvariable=self.num_complexity, font=('helvetica', 20))
+                self.complexity_input.grid(column = 4, row = 1, columnspan= 1, padx = 10, pady=10)
+            return
+        # This works because at each n level in a tree you can have up to possibly 2^n variables and you can also have n variables you can also make n levels
+        self.num_complexity.set(str(n)) # This is just resetting the complexity gui element to add the new min max
+        self.complexity_input.grid_forget()
+        self.complexity_input = Spinbox(self.master, from_ = n, to = var_input, textvariable=self.num_complexity, font=('helvetica', 20))
+        self.complexity_input.grid(column = 4, row = 1, columnspan= 1, padx = 10, pady=10)
         return
 
     def initiate_gui(self):
@@ -220,8 +256,10 @@ class Main_Application():
 
 
         # Make a text box to input values instead
-        self.variable_input = Spinbox(self.master, from_ = 1, to = 100, font=('helvetica', 20))
+        self.variable_input = Spinbox(self.master, from_ = 1, to = 100, textvariable=self.num_variables, font=('helvetica', 20))
         self.variable_input_label = Label(self.master, text = "# of Variables", font=('helvetica', 15))
+
+        self.num_variables.trace('w', self.updateComplexity)
 
         
         # Make a text box to input values instead
@@ -230,9 +268,8 @@ class Main_Application():
 
 
         # Make a textbox to change sizey
-        self.complexity_input = Spinbox(self.master, from_ = 1, to = 100, font=('helvetica', 20))
+        self.complexity_input = Spinbox(self.master, from_ = 1, to = 100, textvariable=self.num_complexity, font=('helvetica', 20))
         self.complexity_label = Label(self.master, text = "'Complexity'", font=('helvetica', 15))
-
         
         # Button to clear the potential
         self.generate_problem = Button(self.master, command = self.generateProblem, text = "Generate", font=('helvetica', 16))
