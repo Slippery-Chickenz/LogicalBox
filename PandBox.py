@@ -153,13 +153,21 @@ class LogicalProblem():
                         random_var = random.choice(possibleVar) # Pick a random variable to add to the split onto the next level
                         if random_var not in used_vars: # If the next random variable is not already used then add it to the used vars
                             used_vars.append(random_var)
-                        next_vars = copy.deepcopy(current_node.getVariables())
-                        next_vars.append(Variable(random_var.getVariable(), True))
-                        self.resolution_tree.addNode(next_vars, (-1,-1), j, i + 1) # Make the parent nodes each with the new random variable along with the variables form the node we split off oftemp = current_node.getVariables()
-                        
-                        next_vars = copy.deepcopy(current_node.getVariables())
-                        next_vars.append(Variable(random_var.getVariable(), False))
-                        self.resolution_tree.addNode(next_vars, (-1,-1), j, i + 1) # Also make the parents nothing and then give it its level and child
+                        next_vars_true = []
+                        next_vars_false = []
+                        for var in current_node.getVariables():
+                            if random.random() < 0.5:
+                                next_vars_true.append(var)
+                                if random.random() < 0.5: # Maybe this one changes
+                                    next_vars_false.append(var)
+                            else:
+                                next_vars_false.append(var)
+                                if random.random() < 0.5: # Maybe this one changes
+                                    next_vars_true.append(var)
+                        next_vars_true.append(Variable(random_var.getVariable(), True))
+                        next_vars_false.append(Variable(random_var.getVariable(), False))
+                        self.resolution_tree.addNode(next_vars_true, (-1,-1), j, i + 1) # Make the parent nodes each with the new random variable along with the variables form the node we split off oftemp = current_node.getVariables()
+                        self.resolution_tree.addNode(next_vars_false, (-1,-1), j, i + 1) # Also make the parents nothing and then give it its level and child
 
                         num_splits_left -= 1
                         
