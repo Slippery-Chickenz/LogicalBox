@@ -147,8 +147,6 @@ class LogicalProblem():
             for i in range(self.resolution_tree.numLevels()):
                 for j in range(self.resolution_tree.levelSize(i)):
                     current_node = self.resolution_tree.getNode(i,j) # Just to say what the current node is
-                    current_node.printNode()
-                    print("")
                     if len(used_vars) == len(self.variables):
                         all_var_used = True
 
@@ -249,8 +247,6 @@ class Main_Application():
         problem = self.problems[problem_num]
         tree = problem.getTree()
         tree.organizeTree()
-        print("\n here ->")
-        tree.printTree()
         for i in range(tree.numLevels()):
             for j in range(tree.levelSize(i)):
                 current_node = tree.getNode(i,j) # Just to say what the current node is
