@@ -49,6 +49,16 @@ class ResolutionNode():
         for i in self.variables:
             print("{},".format(i.stringVar()), end = '')
         print("],{},{})".format(self.parent, self.child), end = '')
+    
+    def __eq__(self, other):
+        if self.parent == other.parent and self.child == other.child:
+            vars_s = self.getVariables()
+            vars_o = other.getVariables()
+            if len(vars_s)==len(vars_o):
+                for i in range(len(vars_s)):
+                    if vars_s[i] == vars_o[i]:
+                        return True
+        return False
 
 # Class to hold the details of the resolution tree (This is mostly necessary because I think it would be nice to draw the tree later and this would help that)
 class ResolutionTree():
@@ -115,13 +125,13 @@ class LogicalProblem():
         used_vars = [] # List to keep track of what variables we have used so far in this tree
         num_splits_left = 2**self.num_complexity - 1
         if self.num_variables < self.num_complexity:
-            print("Too little variables for this complexity.")
+            print("Too few variables for this complexity.")
             return
         if self.validity:
             self.resolution_tree.addNode([], (-1, -1), -1, 0) # If valid then we start with an empty node
         else: # If not valid then we must generate a startin node with variables in it
             if self.num_variables == self.num_complexity:
-                print("Too little variables for this complexity for a non-valid problem.")
+                print("Too few variables for this complexity for a non-valid problem.")
                 return
             init_var = random.sample(self.variables, random.randint(max(1, self.num_variables - num_splits_left), self.num_variables - self.num_complexity)) # Sample of some random variables
             used_vars = copy.deepcopy(init_var) # Note which variables are used
@@ -185,6 +195,29 @@ class LogicalProblem():
                         
                         current_node.changeParent((self.resolution_tree.levelSize(i + 1) - 2, self.resolution_tree.levelSize(i + 1) - 1)) # Set the node we split off of to have the correct parents
 
+    def generatePremises(self):
+        parents = []
+        for level in self.resolution_tree.tree_nodes:
+            for node in level:
+                if node.getParent() == (-1,-1):
+                    parents.append([node])
+        #print(parents)
+        p_ind = random.randrange(len(parents))
+        # TODO: Negate premise
+        premise = parents.pop(p_ind)
+        print(len(parents))
+        while True:
+            ind_sublist = random.sample(range(0,len(parents)), 2)
+            sublist = [parents[ind_sublist[0]],parents[ind_sublist[1]]]
+            parents.pop(ind_sublist[0])
+            if len(ind_sublist) > 1:
+                parents.pop(ind_sublist[1]-1)
+
+            parents.append(sublist)
+            if len(parents) <= self.num_premises:
+                break
+        print(len(parents))
+        self.premises = parents + premise
 
 # Main function for he whole application
 class Main_Application():
@@ -196,6 +229,8 @@ class Main_Application():
         self.num_variables.set('')
         self.num_complexity = StringVar()
         self.num_complexity.set('')
+        self.num_premises = StringVar()
+        self.num_premises.set('')
 
         self.initiate_gui() # Initate all the GUI elements
         self.draw() # Draw all the GUI elements to the window
@@ -203,6 +238,7 @@ class Main_Application():
     def generateProblem(self):
         newProblem = LogicalProblem(int(self.variable_input.get()), int(self.premise_input.get()), int(self.complexity_input.get()), self.valid)
         newProblem.generate_random()
+        newProblem.generatePremises()
         newProblem.resolution_tree.printTree()
         self.problems.append(newProblem)
         self.canvas.delete('all')
