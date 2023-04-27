@@ -183,6 +183,19 @@ class LogicalProblem():
                         
                         current_node.changeParent((self.resolution_tree.levelSize(i + 1) - 2, self.resolution_tree.levelSize(i + 1) - 1)) # Set the node we split off of to have the correct parents
 
+
+
+    # function to generate premise connectors as a function of complexity
+    def generateConnectors(self):
+        '''
+        rng: determine how nodes should be grouped together
+            options: logical and, conditional, biconditional
+        '''
+        #for premise in self.premises:
+        
+        return
+
+    #main function to combine nodes into premises
     def generatePremises(self):
         parents = []
         for level in self.resolution_tree.tree_nodes:
@@ -196,7 +209,7 @@ class LogicalProblem():
         print(len(parents))
         while True:
             ind_sublist = random.sample(range(0,len(parents)), 2)
-            sublist = [parents[ind_sublist[0]],parents[ind_sublist[1]]]
+            sublist = parents[ind_sublist[0]] + parents[ind_sublist[1]]
             parents.pop(ind_sublist[0])
             if len(ind_sublist) > 1:
                 parents.pop(ind_sublist[1]-1)
@@ -204,8 +217,8 @@ class LogicalProblem():
             parents.append(sublist)
             if len(parents) <= self.num_premises:
                 break
-        print(len(parents))
-        self.premises = parents + premise
+        print(parents)
+        self.premises = parents
 
 # Main function for he whole application
 class Main_Application():
