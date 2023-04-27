@@ -14,6 +14,9 @@ class Variable():
     def getVariable(self):
         return self.var_name
     
+    def negateVariable(self):
+        self.truthValue = not self.truthValue
+    
     def __eq__(self, other):
         if self.var_name == other.var_name and self.truthValue == other.truthValue:
             return True

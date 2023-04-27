@@ -19,6 +19,10 @@ class ResolutionNode():
         for i in self.variables:
             print("{},".format(i.stringVar()), end = '')
         print("],{},{})".format(self.parent, self.child), end = '')
+
+    def invertVariables(self):
+        for var in self.variables:
+            var.negateVariable()
     
     def __eq__(self, other):
         if self.parent == other.parent and self.child == other.child:
