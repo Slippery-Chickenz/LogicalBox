@@ -86,6 +86,15 @@ class ResolutionTree():
     def getNode(self, level, num):
         return self.tree_nodes[level][num]
     
+    def organizeTree(self):
+        for level in range(1, self.numLevels()):
+            self.tree_nodes[level] = sorted(self.tree_nodes[level], key = lambda x: x.child)
+            for node in range(len(self.tree_nodes[level])):
+                if not (self.tree_nodes[level][node].parent == (-1, -1)):
+                    self.tree_nodes[level + 1][self.tree_nodes[level][node].parent[0]].child = node
+                    self.tree_nodes[level + 1][self.tree_nodes[level][node].parent[1]].child = node
+
+    
     def printTree(self):
         for i in range(len(self.tree_nodes)):
             print("\n")
@@ -120,13 +129,16 @@ class LogicalProblem():
             return
         if self.validity:
             self.resolution_tree.addNode([], (-1, -1), -1, 0) # If valid then we start with an empty node
-        else:
+        else: # If not valid then we must generate a startin node with variables in it
             if self.num_variables == self.num_complexity:
                 print("Too few variables for this complexity for a non-valid problem.")
                 return
-            init_var = random.sample(self.variables, random.randint(max(1, self.num_variables - num_splits_left), self.num_variables - self.num_complexity))
-            used_vars = copy.deepcopy(init_var)
-            self.resolution_tree.addNode(init_var, (-1, -1), -1, 0) # If not valid then we start with a node with stuff in it
+            init_var = random.sample(self.variables, random.randint(max(1, self.num_variables - num_splits_left), self.num_variables - self.num_complexity)) # Sample of some random variables
+            used_vars = copy.deepcopy(init_var) # Note which variables are used
+            for v in init_var: # Choose them at random to be negations
+                if random.random() < 0.5:
+                    v.truthValue = not v.truthValue
+            self.resolution_tree.addNode(init_var, (-1, -1), -1, 0) # Start the tree with a node of our random variables
 
         all_var_used = False
         # Just temporary set the number of levels of the tree to the complexity so we loop and generate new branches until we get num_complexity levels
@@ -135,8 +147,6 @@ class LogicalProblem():
             for i in range(self.resolution_tree.numLevels()):
                 for j in range(self.resolution_tree.levelSize(i)):
                     current_node = self.resolution_tree.getNode(i,j) # Just to say what the current node is
-                    current_node.printNode()
-                    print("")
                     if len(used_vars) == len(self.variables):
                         all_var_used = True
 
@@ -249,6 +259,7 @@ class Main_Application():
     def drawTree(self, problem_num):
         problem = self.problems[problem_num]
         tree = problem.getTree()
+        tree.organizeTree()
         for i in range(tree.numLevels()):
             for j in range(tree.levelSize(i)):
                 current_node = tree.getNode(i,j) # Just to say what the current node is
@@ -261,6 +272,9 @@ class Main_Application():
                 node_text += '}'
                 dw = 1400/(tree.levelSize(i))
                 self.canvas.create_text(dw*(1/2 + j), 100*(tree.numLevels() - i), text= node_text, fill = 'black', font = ("TkFixedFont", 16))
+                if not (current_node.child == -1):
+                     child_dw = 1400/(tree.levelSize(i - 1))
+                     self.canvas.create_line(dw*(1/2 + j),100*(tree.numLevels() - i) + 10,child_dw*(1/2 + current_node.child),100*(tree.numLevels() - i + 1) - 10, fill="black", width=3)
 
 
     def swapValidity(self):
