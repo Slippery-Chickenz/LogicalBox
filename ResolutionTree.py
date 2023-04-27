@@ -1,4 +1,4 @@
-import ResolutionNode as rn
+from ResolutionNode import ResolutionNode
 
 # Class to hold the details of the resolution tree (This is mostly necessary because I think it would be nice to draw the tree later and this would help that)
 class ResolutionTree():
@@ -15,7 +15,7 @@ class ResolutionTree():
         if len(self.tree_nodes) <= level:
             self.tree_nodes.append([])
         # Add a node to the tree in the proper level
-        self.tree_nodes[level].append(rn.ResolutionNode(variables, parent, child))
+        self.tree_nodes[level].append(ResolutionNode(variables, parent, child))
 
     def numLevels(self):
         return len(self.tree_nodes)

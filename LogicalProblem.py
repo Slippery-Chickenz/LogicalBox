@@ -1,10 +1,11 @@
 import random
 import string
 import copy
-from Connector import Connector
+
 from Variable import Variable
+from ResolutionTree import ResolutionTree
+from Premise import Premise
 from ResolutionNode import ResolutionNode
-import ResolutionTree as rt
 
 # Class to hold a single logical problem and functions that will act on it
 class LogicalProblem():
@@ -19,7 +20,7 @@ class LogicalProblem():
         self.num_complexity = num_complexity # Complexity number for the problem
         self.validity = validity # True or false if this problem is valid or not
 
-        self.resolution_tree = rt.ResolutionTree() # To hold the resolution tree used to generate this problem
+        self.resolution_tree = ResolutionTree() # To hold the resolution tree used to generate this problem
 
     def getTree(self):
         return self.resolution_tree
@@ -103,34 +104,26 @@ class LogicalProblem():
         vara = Variable('A', True)
         varb = Variable('B', True)
         varc = Variable('C', True)
-        con = Connector(vara)
+        #con = Connector(vara)
         nodea = ResolutionNode([vara,varb], (-1,-1), 0)
         nodeb = ResolutionNode([varc, vara], (-1,-1), 0)
-        con = Connector([nodea, nodeb])
+        premise = Premise([nodea, nodeb])
+        #con = Connector([nodea, nodeb])
         return
 
     #main function to combine nodes into premises
     def generatePremises(self):
-        parents = []
+        elders = []
         for level in self.resolution_tree.tree_nodes:
             for node in level:
                 if node.getParent() == (-1,-1):
-                    parents.append([node])
-        #print(parents)
-        p_ind = random.randrange(len(parents))
+                    elders.append(Premise([node]))
         # TODO: Negate premise
-        premise = parents.pop(p_ind)
-        print(len(parents))
         while True:
-            ind_sublist = random.sample(range(0,len(parents)), 2)
-            sublist = parents[ind_sublist[0]] + parents[ind_sublist[1]]
-            parents.pop(ind_sublist[0])
-            if len(ind_sublist) > 1:
-                parents.pop(ind_sublist[1]-1)
-
-            parents.append(sublist)
-            if len(parents) <= self.num_premises:
+            ind_sublist = random.sample(range(0,len(elders)), 2)
+            sublist = elders.pop(ind_sublist[0]) + elders.pop(ind_sublist[1] - 1)
+            elders.append(sublist)
+            if len(elders) <= self.num_premises:
                 break
-        print(parents)
-        self.premises = parents
-        self.generateConnectors()
+        print(elders)
+        self.premises = elders
