@@ -10,7 +10,16 @@ class Premise():
     def __init__(self, clauses):
 
         self.clauses = clauses
+        self.connector
 
+    def getLength(self):
+        return len(self.clauses)
+    
+    def getClauseLength(self, cindex):
+        return len(self.clauses[cindex])
+    
+    def getClause(self, cindex):
+        return self.clauses[cindex]
 
     def addClause(self, clause):
         self.clauses.append(clause)
