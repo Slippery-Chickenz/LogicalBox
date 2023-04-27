@@ -1,8 +1,9 @@
 import random
 import string
 import copy
-
-import Variable
+from Connector import Connector
+from Variable import Variable
+from ResolutionNode import ResolutionNode
 import ResolutionTree as rt
 
 # Class to hold a single logical problem and functions that will act on it
@@ -12,7 +13,7 @@ class LogicalProblem():
         self.num_variables = num_variables # Just the number of variables in this problem
         self.variables = [] # Just a list of the variables names we will use in this problem
         for i in range(num_variables):
-            self.variables.append(Variable.Variable(possible_variables[i], True))
+            self.variables.append(Variable(possible_variables[i], True))
         self.num_premises = num_premises # Number of premises in this problem
         self.premises = [] # List of all the premises
         self.num_complexity = num_complexity # Complexity number for the problem
@@ -86,8 +87,8 @@ class LogicalProblem():
                                 next_vars_false.append(var)
                                 if random.random() < 0.5: # Maybe this one changes
                                     next_vars_true.append(var)
-                        next_vars_true.append(Variable.Variable(random_var.getVariable(), True))
-                        next_vars_false.append(Variable.Variable(random_var.getVariable(), False))
+                        next_vars_true.append(Variable(random_var.getVariable(), True))
+                        next_vars_false.append(Variable(random_var.getVariable(), False))
                         self.resolution_tree.addNode(next_vars_true, (-1,-1), j, i + 1) # Make the parent nodes each with the new random variable along with the variables form the node we split off oftemp = current_node.getVariables()
                         self.resolution_tree.addNode(next_vars_false, (-1,-1), j, i + 1) # Also make the parents nothing and then give it its level and child
 
@@ -99,12 +100,13 @@ class LogicalProblem():
 
     # function to generate premise connectors as a function of complexity
     def generateConnectors(self):
-        '''
-        rng: determine how nodes should be grouped together
-            options: logical and, conditional, biconditional
-        '''
-        #for premise in self.premises:
-        
+        vara = Variable('A', True)
+        varb = Variable('B', True)
+        varc = Variable('C', True)
+        con = Connector(vara)
+        nodea = ResolutionNode([vara,varb], (-1,-1), 0)
+        nodeb = ResolutionNode([varc, vara], (-1,-1), 0)
+        con = Connector([nodea, nodeb])
         return
 
     #main function to combine nodes into premises
@@ -131,3 +133,4 @@ class LogicalProblem():
                 break
         print(parents)
         self.premises = parents
+        self.generateConnectors()
