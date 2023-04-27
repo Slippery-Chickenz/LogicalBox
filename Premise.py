@@ -1,4 +1,4 @@
-import random
+from Connector import Connector
 
 class Premise():
     '''
@@ -23,6 +23,14 @@ class Premise():
 
     def addClause(self, clause):
         self.clauses.append(clause)
+
+    def generateConnector(self):
+        self.connector = Connector(self)
+
+    def negatePremise(self):
+        for clause in self.clauses:
+            clause.invertVariables()
+        
 
     def __add__(self, other):
         new_clauses = self.clauses + other.clauses
