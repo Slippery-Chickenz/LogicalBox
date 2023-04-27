@@ -1,6 +1,6 @@
 
 from tkinter import *
-import LogicalProblem as lp
+from LogicalProblem import LogicalProblem
 
 
 # Main function for he whole application
@@ -20,7 +20,7 @@ class Main_Application():
         self.draw() # Draw all the GUI elements to the window
 
     def generateProblem(self):
-        newProblem = lp.LogicalProblem(int(self.variable_input.get()), int(self.premise_input.get()), int(self.complexity_input.get()), self.valid)
+        newProblem = LogicalProblem(int(self.variable_input.get()), int(self.premise_input.get()), int(self.complexity_input.get()), self.valid)
         newProblem.generate_random()
         newProblem.generatePremises()
         newProblem.resolution_tree.printTree()

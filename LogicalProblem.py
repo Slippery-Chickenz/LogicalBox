@@ -2,8 +2,9 @@ import random
 import string
 import copy
 
-import Variable
-import ResolutionTree as rt
+from Variable import Variable
+from ResolutionTree import ResolutionTree
+from Premise import Premise
 
 # Class to hold a single logical problem and functions that will act on it
 class LogicalProblem():
@@ -12,13 +13,13 @@ class LogicalProblem():
         self.num_variables = num_variables # Just the number of variables in this problem
         self.variables = [] # Just a list of the variables names we will use in this problem
         for i in range(num_variables):
-            self.variables.append(Variable.Variable(possible_variables[i], True))
+            self.variables.append(Variable(possible_variables[i], True))
         self.num_premises = num_premises # Number of premises in this problem
         self.premises = [] # List of all the premises
         self.num_complexity = num_complexity # Complexity number for the problem
         self.validity = validity # True or false if this problem is valid or not
 
-        self.resolution_tree = rt.ResolutionTree() # To hold the resolution tree used to generate this problem
+        self.resolution_tree = ResolutionTree() # To hold the resolution tree used to generate this problem
 
     def getTree(self):
         return self.resolution_tree
@@ -86,8 +87,8 @@ class LogicalProblem():
                                 next_vars_false.append(var)
                                 if random.random() < 0.5: # Maybe this one changes
                                     next_vars_true.append(var)
-                        next_vars_true.append(Variable.Variable(random_var.getVariable(), True))
-                        next_vars_false.append(Variable.Variable(random_var.getVariable(), False))
+                        next_vars_true.append(Variable(random_var.getVariable(), True))
+                        next_vars_false.append(Variable(random_var.getVariable(), False))
                         self.resolution_tree.addNode(next_vars_true, (-1,-1), j, i + 1) # Make the parent nodes each with the new random variable along with the variables form the node we split off oftemp = current_node.getVariables()
                         self.resolution_tree.addNode(next_vars_false, (-1,-1), j, i + 1) # Also make the parents nothing and then give it its level and child
 
@@ -109,25 +110,17 @@ class LogicalProblem():
 
     #main function to combine nodes into premises
     def generatePremises(self):
-        parents = []
+        elders = []
         for level in self.resolution_tree.tree_nodes:
             for node in level:
                 if node.getParent() == (-1,-1):
-                    parents.append([node])
-        #print(parents)
-        p_ind = random.randrange(len(parents))
+                    elders.append(Premise([node]))
         # TODO: Negate premise
-        premise = parents.pop(p_ind)
-        print(len(parents))
         while True:
-            ind_sublist = random.sample(range(0,len(parents)), 2)
-            sublist = parents[ind_sublist[0]] + parents[ind_sublist[1]]
-            parents.pop(ind_sublist[0])
-            if len(ind_sublist) > 1:
-                parents.pop(ind_sublist[1]-1)
-
-            parents.append(sublist)
-            if len(parents) <= self.num_premises:
+            ind_sublist = random.sample(range(0,len(elders)), 2)
+            sublist = elders.pop(ind_sublist[0]) + elders.pop(ind_sublist[1] - 1)
+            elders.append(sublist)
+            if len(elders) <= self.num_premises:
                 break
-        print(parents)
-        self.premises = parents
+        print(elders)
+        self.premises = elders
