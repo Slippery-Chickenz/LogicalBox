@@ -28,5 +28,7 @@ We hope that this project provides a good starting point for future expansion an
 
 # Contributors
 Luke Dyer: 2023
+
 Kathryn Carbone: 2023
+
 Rom Simovitch: 2023
