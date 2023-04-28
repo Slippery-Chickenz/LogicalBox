@@ -30,15 +30,6 @@ class Main_Application():
 
     def generatePremises(self):
         self.problems[-1].generatePremises(int(self.premise_input.get()))
-        print("\n+++++++++++++++++++++++++++++++\n Regular ")
-        for i in range(len(self.problems[-1].premises)):
-            self.problems[-1].premises[i].printPremise()
-        print("+++++++++++++++++++++++++++++++")
-        print("\n+++++++++++++++++++++++++++++++\n negated ")
-        for i in range(len(self.problems[-1].premises)):
-            self.problems[-1].premises[i].negatePremise()
-            self.problems[-1].premises[i].printPremise()
-        print("+++++++++++++++++++++++++++++++")
         return
 
 

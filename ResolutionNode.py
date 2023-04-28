@@ -27,19 +27,6 @@ class ResolutionNode():
             print("],{},{})".format(self.parent, self.child), end = '')
         else:
             print("])", end = '')
-
-    def invertVariables(self):
-        for var in self.variables:
-            var.negateVariable()
-
-    def simplifyClause(self):
-        temp = []
-        [temp.append(x) for x in self.variables if x not in temp]
-        self.variables = temp
-        temp = []
-        [temp.append(x) for x in self.variables if Variable(x.getVariable(), not x.getTruthValue()) not in self.variables]
-        self.variables = temp
-        
     
     def __eq__(self, other):
         if self.parent == other.parent and self.child == other.child:
