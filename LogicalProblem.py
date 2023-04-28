@@ -18,7 +18,6 @@ class LogicalProblem():
     num_complexity: determines how often to branch
     validity: valid/invalid flag
     resolution_tree: holds tree for problem
-    conclusion: a single connector class element representing a negated conclusion
     '''
 
     def __init__(self, num_variables, num_premises, num_complexity, validity):
@@ -30,7 +29,6 @@ class LogicalProblem():
         self.num_premises = num_premises
         self.premises = []
         self.connector = []
-        self.conclusion = 0
         self.num_complexity = num_complexity
         self.validity = validity
 
@@ -143,16 +141,13 @@ class LogicalProblem():
             if len(elders) <= self.num_premises+1:
                 break
         self.premises = elders
-        #always select last premise to be conclusion
         random.shuffle(self.premises)
-        self.conclusion = copy.deepcopy(self.premises[-1])
 
         #immediately generate connectors for premises
         self.generateConnectors()
     
     # function to generate premise connectors
     def generateConnectors(self):
-        #conclusion = self.premises.pop(random.randint(0,len(self.premises)))
         for prem in self.premises:
             self.connector.append(Connector(copy.deepcopy(prem), True))
             print("\n PREMISE <", end = '')
@@ -161,9 +156,7 @@ class LogicalProblem():
             print(">\n CONNECTOR")
             self.connector[-1].printCon()
 
-        self.conclusion = Connector(copy.deepcopy(self.conclusion), True)
-        self.conclusion.printCon()
-        self.conclusion.negateStatement()
-        self.conclusion.printCon()
+        #last element of connector list is conclusion so negate
+        self.connector[-1].negateStatement()
         return
 
