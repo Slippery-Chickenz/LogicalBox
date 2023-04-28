@@ -163,15 +163,8 @@ class LogicalProblem():
         self.connector = []
         for prem in self.premises:
             self.connector.append(Connector(copy.deepcopy(prem), True))
-            print("\n PREMISE <", end = '')
-            for nod in prem:
-                nod.printNode(False)
-            print(">\n CONNECTOR")
-            self.connector[-1].printCon()
 
         #last element of connector list is conclusion so negate
-        print("This boi")
-        self.connector[-1].printCon()
         self.connector[-1].negateStatement()
         return
 

@@ -65,11 +65,10 @@ class Connector():
         self.flag = not self.flag
         #if was neg and now pos
         if self.flag:
-            self.str = self.str[2:]
+            self.str = self.str[3:-2]
         #if was pos and now neg
         else:
-            self.str = " ~" + self.str[1:]
-        print("THIS IONE ->>", self.str)
+            self.str = " ~(" + self.str[1:] + ") "
         self.setLatexStr()
 
     #Recursive initialization function
@@ -131,8 +130,8 @@ class Connector():
         self.left = Connector(left, left_flag)
         self.right = Connector(right, right_flag)
 
-        self.str = "(" + self.left.getString() + self.connector + self.right.getString() + ") "
+        self.str = "" + self.left.getString() + self.connector + self.right.getString()
         if self.flag:
-            self.str = " " + self.str
+            self.str = " " + self.str + " "
         else:
-            self.str = " ~" + self.str
+            self.str = " ~(" + self.str + ") "

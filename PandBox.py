@@ -30,10 +30,11 @@ class Main_Application():
     def generateProblem(self):
         newProblem = LogicalProblem(int(self.variable_input.get()), int(self.premise_input.get()), int(self.complexity_input.get()), self.valid)
         newProblem.generate_random()
-        newProblem.resolution_tree.printTree()
         self.problems.append(newProblem)
         self.canvas.delete('all')
         self.drawTree(-1)
+        self.premise_input = Spinbox(self.master, from_ = 0, to = newProblem.getNumPossiblePremises() - 1, font=('helvetica', 20))
+        self.premise_input.grid(column = 3, row = 1, columnspan= 1, padx = 10, pady=10)
 
     def generatePremises(self):
         self.problems[-1].generatePremises(int(self.premise_input.get()))
@@ -64,7 +65,7 @@ class Main_Application():
             if (con == len(connectors) - 1):
                 latex_str = 'Conclusion: ' + latex_str
             self.premise_subplots[-1].clear()
-            self.premise_subplots[-1].text(0.2, 0.6, latex_str, fontsize = 14)
+            self.premise_subplots[-1].text(0.05, 0.6, latex_str, fontsize = 14)
             self.connector_canvas[-1].draw()
 
         self.connector_frame.update_idletasks()
@@ -175,7 +176,7 @@ class Main_Application():
         self.num_variables.trace('w', self.updateComplexity)
 
         # Make a text box to input values instead
-        self.premise_input = Spinbox(self.master, from_ = 1, to = 100, font=('helvetica', 20))
+        self.premise_input = Spinbox(self.master, from_ = 0, to = 1, font=('helvetica', 20))
         self.premise_input_label = Label(self.master, text = "# of Premises", font=('helvetica', 15))
 
 
