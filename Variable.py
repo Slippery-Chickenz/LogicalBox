@@ -14,6 +14,9 @@ class Variable():
     def getVariable(self):
         return self.var_name
     
+    def getTruthValue(self):
+        return self.truthValue
+    
     def negateVariable(self):
         self.truthValue = not self.truthValue
     

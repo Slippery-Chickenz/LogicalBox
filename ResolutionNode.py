@@ -1,3 +1,5 @@
+from Variable import Variable
+
 # Class to hold all the data needed in a node in the tree. This is useful again mostly just to draw the tree (I'm sorry)
 class ResolutionNode():
     def __init__(self, variables, parent, child):
@@ -11,10 +13,13 @@ class ResolutionNode():
     def getVariables(self):
         return self.variables
     
+    def numVariables(self):
+        return len(self.variables)
+    
     def changeParent(self, new_parents):
         self.parent = new_parents
 
-    def printNode(self):
+    def printNode(self, par_child = True):
         print("([", end = '')
         for i in self.variables:
             print("{},".format(i.stringVar()), end = '')

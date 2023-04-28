@@ -1,5 +1,5 @@
 from Connector import Connector
-
+from ResolutionNode import ResolutionNode
 class Premise():
     '''
     class to encapsulate a logical statement defined as
@@ -27,13 +27,12 @@ class Premise():
     def generateConnector(self):
         self.connector = Connector(self)
 
-    def printPrem(self):
-        self.connector.printCon()
-
-    def negatePremise(self):
+    def printPremise(self):
+        print("[", end = '')
         for clause in self.clauses:
-            clause.invertVariables()
-        
+            clause.printNode(False)
+        print("]")
+        return
 
     def __add__(self, other):
         new_clauses = self.clauses + other.clauses
