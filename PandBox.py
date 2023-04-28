@@ -1,5 +1,8 @@
-
+import matplotlib
+import matplotlib.pyplot as plt
 from tkinter import *
+from tkinter import ttk
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from LogicalProblem import LogicalProblem
 
 
@@ -16,6 +19,11 @@ class Main_Application():
         self.num_premises = StringVar()
         self.num_premises.set('')
 
+        self.premise_figures = []
+        self.premise_subplots = []
+        self.premise_canvas = []
+        self.connector_canvas = []
+
         self.initiate_gui() # Initate all the GUI elements
         self.draw() # Draw all the GUI elements to the window
 
@@ -29,8 +37,45 @@ class Main_Application():
 
     def generatePremises(self):
         self.problems[-1].generatePremises(int(self.premise_input.get()))
+        self.drawPremises()
         return
+    
+    def drawPremises(self):
+        problem = self.problems[-1]
+        connectors = problem.getConnectors()
+        self.premise_figures = []
+        self.premise_subplots = []
+        self.forgetPremiseCanvas()
+        self.connector_canvas = []
+        for con in range(len(connectors)):
 
+            self.premise_figures.append(matplotlib.figure.Figure(figsize=(12,1), dpi = 100))
+            self.premise_subplots.append(self.premise_figures[-1].add_subplot(111))
+            self.connector_canvas.append(FigureCanvasTkAgg(self.premise_figures[-1], master = self.connector_frame))
+
+            
+            self.connector_canvas[-1].get_tk_widget().grid(column = 0, row = 0 + con, columnspan=3, sticky = 'news')
+            self.premise_subplots[-1].get_xaxis().set_visible(False)
+            self.premise_subplots[-1].get_yaxis().set_visible(False)
+
+            
+            latex_str=  connectors[con].getLatexString()
+            latex_str = "$" + latex_str + "$"
+            if (con == len(connectors) - 1):
+                latex_str = 'Conclusion: ' + latex_str
+            self.premise_subplots[-1].clear()
+            self.premise_subplots[-1].text(0.2, 0.6, latex_str, fontsize = 14)
+            self.connector_canvas[-1].draw()
+
+        self.connector_frame.update_idletasks()
+        self.premise_canvas.config(scrollregion=self.premise_canvas.bbox("all"))
+
+        return
+    
+    def forgetPremiseCanvas(self):
+        for can in self.connector_canvas:
+            for item in can.get_tk_widget().find_all():
+                can.get_tk_widget().delete(item)
 
     def drawTree(self, problem_num):
         problem = self.problems[problem_num]
@@ -46,10 +91,10 @@ class Main_Application():
                 if len(node_text) > 1:
                     node_text = node_text[:-1]
                 node_text += '}'
-                dw = 1400/(tree.levelSize(i))
-                self.canvas.create_text(dw*(1/2 + j), 100*(tree.numLevels() - i), text= node_text, fill = 'black', font = ("TkFixedFont", 16))
+                dw = 1200/(tree.levelSize(i))
+                self.canvas.create_text(dw*(1/2 + j), 100*(tree.numLevels() - i), text= node_text, fill = 'black', font = ("TkFixedFont", 14))
                 if not (current_node.child == -1):
-                     child_dw = 1400/(tree.levelSize(i - 1))
+                     child_dw = 1200/(tree.levelSize(i - 1))
                      self.canvas.create_line(dw*(1/2 + j),100*(tree.numLevels() - i) + 10,child_dw*(1/2 + current_node.child),100*(tree.numLevels() - i + 1) - 10, fill="black", width=3)
 
 
@@ -90,6 +135,9 @@ class Main_Application():
         self.complexity_input = Spinbox(self.master, from_ = n, to = var_input, textvariable=self.num_complexity, font=('helvetica', 20))
         self.complexity_input.grid(column = 4, row = 1, columnspan= 1, padx = 10, pady=10)
         return
+    
+    def _on_mousewheel(self, event):
+        self.premise_canvas.yview_scroll(int(-1*(event.delta/120)), "units")
 
     def initiate_gui(self):
 
@@ -101,6 +149,24 @@ class Main_Application():
         self.master.columnconfigure(5, weight =1, minsize=50)
         self.master.columnconfigure(6, weight =1, minsize=220)
 
+        self.premise_frame = Frame(self.master, width=1200, height=300)
+        self.premise_frame.grid(column=1, row=3, columnspan= 6)
+        self.premise_frame.grid_rowconfigure(0, weight=1)
+        self.premise_frame.grid_columnconfigure(0, weight=1)
+        #self.premise_frame.grid_propagate(False)
+
+        self.premise_canvas = Canvas(self.premise_frame, bg = "yellow", width=1200, height=300)
+        self.premise_canvas.grid(row =0, column=0, sticky="news", columnspan=6)
+
+        self.vsb = Scrollbar(self.premise_frame, orient='vertical', command=self.premise_canvas.yview)
+        self.premise_canvas.config(yscrollcommand=self.vsb.set)
+        self.premise_canvas.bind_all("<MouseWheel>", self._on_mousewheel)
+        self.vsb.grid(row = 0, column= 1, rowspan=4, sticky= 'ns')
+
+        self.connector_frame = Frame(self.premise_canvas, bg = 'blue')
+        self.premise_canvas.create_window((0,0), window=self.connector_frame, anchor='center')
+
+
 
         # Make a text box to input values instead
         self.variable_input = Spinbox(self.master, from_ = 1, to = 100, textvariable=self.num_variables, font=('helvetica', 20))
@@ -108,7 +174,6 @@ class Main_Application():
 
         self.num_variables.trace('w', self.updateComplexity)
 
-        
         # Make a text box to input values instead
         self.premise_input = Spinbox(self.master, from_ = 1, to = 100, font=('helvetica', 20))
         self.premise_input_label = Label(self.master, text = "# of Premises", font=('helvetica', 15))
@@ -128,7 +193,10 @@ class Main_Application():
         self.generate_premises = Button(self.master, command = self.generatePremises, text = "Generate Premises", font=('helvetica', 16))
 
         # Canvas to draw the tree onto
-        self.canvas = Canvas(self.master, bg="SpringGreen2", width= 1400, height = 750)
+        self.canvas = Canvas(self.master, bg="SpringGreen2", width= 1200, height = 600)
+
+
+
 
     def draw(self):
         
@@ -156,9 +224,8 @@ class Main_Application():
 
         self.can_satisfy.grid(column=5, row=1, columnspan=1, pady=10)
 
-        # Draw the canvas
-
-        self.canvas.grid(column = 1, row = 3, columnspan= 6)
+        # Draw the canvas and scroll bar
+        self.canvas.grid(column = 1, row = 2, columnspan= 6)
 
 
         return

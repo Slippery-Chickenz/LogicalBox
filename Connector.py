@@ -18,6 +18,7 @@ class Connector():
 
     def __init__(self, premise, flag):
         self.str = ''
+        self.latex_str = ''
         self.connector = '|'
         self.flag = flag
         self.left = []
@@ -33,13 +34,31 @@ class Connector():
         elif coin_flip > 0.33 and coin_flip <= 0.66:
             return '|', 1
         else:
-            return '-->', 1
+            return '>', 1
         
     def printCon(self):
         print(self.str)
 
     def getString(self):
         return self.str
+    
+    def getLatexString(self):
+        self.setLatexStr()
+        return self.latex_str
+    
+    def setLatexStr(self):
+        self.latex_str = ''
+        for char in self.str:
+            if char == "~":
+                self.latex_str = self.latex_str + "\\neg "
+            elif char == "|":
+                self.latex_str = self.latex_str + "\\vee "
+            elif char == "&":
+                self.latex_str = self.latex_str + "\\wedge "
+            elif char == ">":
+                self.latex_str = self.latex_str + "\\rightarrow "
+            else:
+                self.latex_str = self.latex_str + char
     
     #function to negate entire premise
     def negateStatement(self):
@@ -50,6 +69,8 @@ class Connector():
         #if was pos and now neg
         else:
             self.str = " ~" + self.str[1:]
+        print("THIS IONE ->>", self.str)
+        self.setLatexStr()
 
     #Recursive initialization function
     def recursiveInit(self, premise):
@@ -93,7 +114,7 @@ class Connector():
                 self.flag = not self.flag
                 left_flag = not left_flag
                 right_flag = not right_flag
-            elif connector == "-->":
+            elif connector == ">":
                 left_flag = not left_flag
 
         elif self.connector == '&':

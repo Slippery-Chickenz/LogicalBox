@@ -28,6 +28,7 @@ class LogicalProblem():
             self.variables.append(Variable(possible_variables[i], True))
         self.num_premises = num_premises
         self.premises = []
+        self.num_possible_premises = 0
         self.connector = []
         self.num_complexity = num_complexity
         self.validity = validity
@@ -37,6 +38,9 @@ class LogicalProblem():
 
     def getTree(self):
         return self.resolution_tree
+    
+    def getConnectors(self):
+        return self.connector
     
     #Main function to generate random logical problem
     def generate_random(self):
@@ -119,6 +123,14 @@ class LogicalProblem():
                         #update parents of current node
                         current_node.changeParent((self.resolution_tree.levelSize(i + 1) - 2, self.resolution_tree.levelSize(i + 1) - 1))
 
+    def getNumPossiblePremises(self):
+        n = 0
+        for level in self.resolution_tree.tree_nodes:
+            for node in level:
+                if node.getParent() == (-1,-1):
+                    n += 1
+        return n
+
 
     #main function to combine nodes into premises
     def generatePremises(self, num_premises):
@@ -133,13 +145,13 @@ class LogicalProblem():
                     elders.append([copy.deepcopy(node)])
         # TODO: Negate premise
         while True:
-            #randomly select two clauses to combine
+            #one of elders will be premise
+            if len(elders) <= self.num_premises + 1:
+                break
+            #randomly select twot clauses to combine
             ind_sublist = random.sample(range(0,len(elders)), 2)
             sublist = elders.pop(ind_sublist[0]) + elders.pop(ind_sublist[1] - 1)
             elders.append(sublist)
-            #one of elders will be premise
-            if len(elders) <= self.num_premises+1:
-                break
         self.premises = elders
         random.shuffle(self.premises)
 
@@ -148,6 +160,7 @@ class LogicalProblem():
     
     # function to generate premise connectors
     def generateConnectors(self):
+        self.connector = []
         for prem in self.premises:
             self.connector.append(Connector(copy.deepcopy(prem), True))
             print("\n PREMISE <", end = '')
@@ -157,6 +170,8 @@ class LogicalProblem():
             self.connector[-1].printCon()
 
         #last element of connector list is conclusion so negate
+        print("This boi")
+        self.connector[-1].printCon()
         self.connector[-1].negateStatement()
         return
 
