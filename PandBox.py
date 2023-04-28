@@ -100,7 +100,6 @@ class Main_Application():
                      child_dw = 1200/(tree.levelSize(i - 1))
                      self.canvas.create_line(dw*(1/2 + j),100*(tree.numLevels() - i) + 10,child_dw*(1/2 + current_node.child),100*(tree.numLevels() - i + 1) - 10, fill="black", width=3)
 
-
     def swapValidity(self):
         self.valid = not self.valid
 
@@ -142,6 +141,23 @@ class Main_Application():
     def _on_mousewheel(self, event):
         self.premise_canvas.yview_scroll(int(-1*(event.delta/120)), "units")
 
+    def savePremises(self):
+        with open('Problem.txt', 'w') as f:
+            if len(self.problems) == 0 or len(self.problems[-1].getConnectors()) == 0:
+                return
+            problem = self.problems[-1]
+            connectors = problem.getConnectors()
+            for con in range(len(connectors)):
+                latex_str=  connectors[con].getLatexString()
+                latex_str = "$$" + latex_str + "$$"
+                if (con == len(connectors) - 1):
+                    latex_str = 'Conclusion: ' + latex_str
+                else:
+                    latex_str = "Premise " + str(con + 1) + ": " + latex_str
+                f.write(latex_str)
+                f.write("\n")
+        return
+
     def initiate_gui(self):
 
         # Forcing different columns to be set width for the UI so it can only get so small
@@ -153,13 +169,13 @@ class Main_Application():
         self.master.columnconfigure(6, weight =1, minsize=220)
 
         self.premise_frame = Frame(self.master, width=1200, height=300)
-        self.premise_frame.grid(column=1, row=3, columnspan= 6)
+        self.premise_frame.grid(column=1, row=3, columnspan= 7)
         self.premise_frame.grid_rowconfigure(0, weight=1)
         self.premise_frame.grid_columnconfigure(0, weight=1)
         #self.premise_frame.grid_propagate(False)
 
         self.premise_canvas = Canvas(self.premise_frame, bg = "yellow", width=1200, height=300)
-        self.premise_canvas.grid(row =0, column=0, sticky="news", columnspan=6)
+        self.premise_canvas.grid(row =0, column=0, sticky="news", columnspan=7)
 
         self.vsb = Scrollbar(self.premise_frame, orient='vertical', command=self.premise_canvas.yview)
         self.premise_canvas.config(yscrollcommand=self.vsb.set)
@@ -168,8 +184,6 @@ class Main_Application():
 
         self.connector_frame = Frame(self.premise_canvas, bg = 'blue')
         self.premise_canvas.create_window((0,0), window=self.connector_frame, anchor='center')
-
-
 
         # Make a text box to input values instead
         self.variable_input = Spinbox(self.master, from_ = 1, to = 100, textvariable=self.num_variables, font=('helvetica', 20))
@@ -194,6 +208,9 @@ class Main_Application():
 
         # Button to clear the potential
         self.generate_premises = Button(self.master, command = self.generatePremises, text = "Generate Premises", font=('helvetica', 16))
+
+        # Button to save the premises
+        self.save_premises = Button(self.master, command = self.savePremises, text = "Save Premises", font = ('helvetica', 16))
 
         # Canvas to draw the tree onto
         self.canvas = Canvas(self.master, bg="SpringGreen2", width= 1200, height = 600)
@@ -222,10 +239,13 @@ class Main_Application():
         # Draw the button to generate the problem and swap if it is valid
         self.generate_premises.grid(column = 6, row = 1, columnspan= 1, padx = 10, pady=10)
 
+        # Draw the save premis buttton
+        self.save_premises.grid(column= 7, row= 1, columnspan= 1, padx=10, pady=10)
+
         self.can_satisfy.grid(column=5, row=1, columnspan=1, pady=10)
 
         # Draw the canvas and scroll bar
-        self.canvas.grid(column = 1, row = 2, columnspan= 6)
+        self.canvas.grid(column = 1, row = 2, columnspan= 7)
 
 
         return
@@ -254,6 +274,9 @@ class Main_Application():
 
         # Forget the button to generate
         self.generate_premises.grid_forget()
+
+        #Forge the save premises button
+        self.save_premises.grid_forget()
 
 
 # if __name__ == "__main__": lmao

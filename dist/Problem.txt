@@ -1,0 +1,1 @@
+Conclusion: $$  \neg ( B\wedge  A) \rightarrow   \neg B\wedge  C  \vee  \neg ( A\wedge   B\vee  C ) $$
