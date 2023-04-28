@@ -22,7 +22,6 @@ class Main_Application():
     def generateProblem(self):
         newProblem = LogicalProblem(int(self.variable_input.get()), int(self.premise_input.get()), int(self.complexity_input.get()), self.valid)
         newProblem.generate_random()
-        #newProblem.generatePremises()
         newProblem.resolution_tree.printTree()
         self.problems.append(newProblem)
         self.canvas.delete('all')

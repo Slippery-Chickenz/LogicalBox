@@ -23,6 +23,9 @@ class ResolutionNode():
         print("([", end = '')
         for i in self.variables:
             print("{},".format(i.stringVar()), end = '')
+        if not par_child:
+            print("])", end = '')
+            return
         print("],{},{})".format(self.parent, self.child), end = '')
 
     def invertVariables(self):

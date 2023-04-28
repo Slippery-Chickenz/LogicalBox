@@ -4,8 +4,8 @@ import copy
 
 from Variable import Variable
 from ResolutionTree import ResolutionTree
-from Premise import Premise
 from ResolutionNode import ResolutionNode
+from Connector import Connector
 
 # Class to hold a single logical problem and functions that will act on it
 class LogicalProblem():
@@ -17,12 +17,12 @@ class LogicalProblem():
             self.variables.append(Variable(possible_variables[i], True))
         self.num_premises = num_premises # Number of premises in this problem
         self.premises = [] # List of all the premises
+        self.connector = []
         self.num_complexity = num_complexity # Complexity number for the problem
         self.validity = validity # True or false if this problem is valid or not
 
         self.resolution_tree = ResolutionTree() # To hold the resolution tree used to generate this problem
 
-        random.seed(84)
 
     def getTree(self):
         return self.resolution_tree
@@ -103,30 +103,39 @@ class LogicalProblem():
 
     # function to generate premise connectors as a function of complexity
     def generateConnectors(self):
+        '''
         vara = Variable('A', True)
-        varb = Variable('B', True)
+        varb = Variable('B', False)
         varc = Variable('C', True)
         #con = Connector(vara)
-        nodea = ResolutionNode([vara,varb], (-1,-1), 0)
+        nodea = ResolutionNode([vara,varb, varc], (-1,-1), 0)
         nodeb = ResolutionNode([varc, vara], (-1,-1), 0)
         nodec = ResolutionNode([vara], (-1,-1), 0)
-        premise = Premise([nodea])
-        premise.generateConnector()
+        premise = [nodea, nodeb, nodec]
+        self.connector = Connector(premise, True)
+        self.connector.printCon()
         #premise.printPrem()
         #con = Connector([nodea, nodeb])
+        '''
+        for prem in self.premises:
+            self.connector.append(Connector(copy.deepcopy(prem), True))
+            print("\n PREMISE <", end = '')
+            for nod in prem:
+                nod.printNode(False)
+            print(">\n CONNECTOR")
+            self.connector[-1].printCon()
         return
 
     #main function to combine nodes into premises
     def generatePremises(self, num_premises):
         
-        random.seed(84)
         self.premises = []
         self.num_premises = num_premises
         elders = []
         for level in self.resolution_tree.tree_nodes:
             for node in level:
                 if node.getParent() == (-1,-1):
-                    elders.append(Premise([copy.deepcopy(node)]))
+                    elders.append([copy.deepcopy(node)])
         # TODO: Negate premise
         while True:
             ind_sublist = random.sample(range(0,len(elders)), 2)
