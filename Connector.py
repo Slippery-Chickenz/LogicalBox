@@ -41,6 +41,16 @@ class Connector():
     def getString(self):
         return self.str
     
+    #function to negate entire premise
+    def negateStatement(self):
+        self.flag = not self.flag
+        #if was neg and now pos
+        if self.flag:
+            self.str = self.str[2:]
+        #if was pos and now neg
+        else:
+            self.str = " ~" + self.str[1:]
+
     #Recursive initialization function
     def recursiveInit(self, premise):
 
@@ -54,7 +64,7 @@ class Connector():
                 self.connector = "&"
                 if not self.flag:
                     clause.getVariables()[0].negateVariable()
-                self.str = clause.getVariables()[0].stringVar()
+                self.str = ' ' + clause.getVariables()[0].stringVar()
                 return
             #If clause is not, split variables and recurse
             left = []
