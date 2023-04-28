@@ -2,11 +2,16 @@ from ResolutionNode import ResolutionNode
 
 # Class to hold the details of the resolution tree (This is mostly necessary because I think it would be nice to draw the tree later and this would help that)
 class ResolutionTree():
+    '''
+    Class to hold resolution tree structure
+    tree_nodes: a list of all nodes in the tree
+    total_size: a list of lists with each index value for each sub list corresponding to the level of the tree.
+                The lowest level (level 0) corresponds to the first sublist.
+    '''
     def __init__(self):
-        self.tree_nodes = [] # Just a list of all the nodes in the tree
+        self.tree_nodes = []
         self.total_size = 0
-         # This will be a list of lists and each index value for each sub list is the level of the tree with the first one being the 'lowest on the tree' so we start with level 0 as the firstr
-         # item in the list and then as we go up the tree to the top where we would normally start that would be the end of the list.
+
 
     # Function to add nodes to the tree as a certain level
     def addNode(self, variables, parent, child, level):
@@ -26,6 +31,7 @@ class ResolutionTree():
     def getNode(self, level, num):
         return self.tree_nodes[level][num]
     
+    #Function to rearrange tree nodes such that parents are near their children in each subsequent level
     def organizeTree(self):
         for level in range(1, self.numLevels()):
             self.tree_nodes[level] = sorted(self.tree_nodes[level], key = lambda x: x.child)

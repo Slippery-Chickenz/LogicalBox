@@ -1,7 +1,13 @@
 from Variable import Variable
 
-# Class to hold all the data needed in a node in the tree. This is useful again mostly just to draw the tree (I'm sorry)
 class ResolutionNode():
+    '''
+    Class to hold node data for tree generation. Each node represents a Resolution clause
+    variables: a list of variables contained in the clause. Always members of the Variable class
+    parent: The ID of a node's parent node. (-1,-1) indicates a root node
+    child: The ID of a node's child node.
+    '''
+
     def __init__(self, variables, parent, child):
         self.variables = variables
         self.parent = parent
@@ -28,10 +34,12 @@ class ResolutionNode():
             return
         print("],{},{})".format(self.parent, self.child), end = '')
 
+    #Function to negate all variables in a clause
     def invertVariables(self):
         for var in self.variables:
             var.negateVariable()
 
+    #Function to determine whether the clause is an atomic statement
     def isAtom(self):
         if len(self.variables) == 1:
             return True
