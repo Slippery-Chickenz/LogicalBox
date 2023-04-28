@@ -22,11 +22,24 @@ class Main_Application():
     def generateProblem(self):
         newProblem = LogicalProblem(int(self.variable_input.get()), int(self.premise_input.get()), int(self.complexity_input.get()), self.valid)
         newProblem.generate_random()
-        newProblem.generatePremises()
+        #newProblem.generatePremises()
         newProblem.resolution_tree.printTree()
         self.problems.append(newProblem)
         self.canvas.delete('all')
         self.drawTree(-1)
+
+    def generatePremises(self):
+        self.problems[-1].generatePremises(int(self.premise_input.get()))
+        print("\n+++++++++++++++++++++++++++++++\n Regular ")
+        for i in range(len(self.problems[-1].premises)):
+            self.problems[-1].premises[i].printPremise()
+        print("+++++++++++++++++++++++++++++++")
+        print("\n+++++++++++++++++++++++++++++++\n negated ")
+        for i in range(len(self.problems[-1].premises)):
+            self.problems[-1].premises[i].negatePremise()
+            self.problems[-1].premises[i].printPremise()
+        print("+++++++++++++++++++++++++++++++")
+        return
 
 
     def drawTree(self, problem_num):
@@ -96,7 +109,7 @@ class Main_Application():
         self.master.columnconfigure(3, weight =1, minsize=150)
         self.master.columnconfigure(4, weight =1, minsize=150)
         self.master.columnconfigure(5, weight =1, minsize=50)
-        self.master.columnconfigure(6, weight =1)
+        self.master.columnconfigure(6, weight =1, minsize=220)
 
 
         # Make a text box to input values instead
@@ -121,6 +134,9 @@ class Main_Application():
         # Button to clear the potential
         self.can_satisfy = Button(self.master, command = self.swapValidity, text = "    ", bg = 'green', font=('helvetica', 16))
 
+        # Button to clear the potential
+        self.generate_premises = Button(self.master, command = self.generatePremises, text = "Generate Premises", font=('helvetica', 16))
+
         # Canvas to draw the tree onto
         self.canvas = Canvas(self.master, bg="SpringGreen2", width= 1400, height = 750)
 
@@ -144,11 +160,15 @@ class Main_Application():
         # Draw the button to generate the problem and swap if it is valid
         self.generate_problem.grid(column = 1, row = 1, columnspan= 1, padx = 10, pady=10)
 
+        
+        # Draw the button to generate the problem and swap if it is valid
+        self.generate_premises.grid(column = 6, row = 1, columnspan= 1, padx = 10, pady=10)
+
         self.can_satisfy.grid(column=5, row=1, columnspan=1, pady=10)
 
         # Draw the canvas
 
-        self.canvas.grid(column = 1, row = 3, columnspan= 5)
+        self.canvas.grid(column = 1, row = 3, columnspan= 6)
 
 
         return
@@ -175,6 +195,8 @@ class Main_Application():
         # Forget the button to generate
         self.generate_problem.grid_forget()
 
+        # Forget the button to generate
+        self.generate_premises.grid_forget()
 
 
 # if __name__ == "__main__": lmao

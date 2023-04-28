@@ -21,6 +21,8 @@ class LogicalProblem():
 
         self.resolution_tree = ResolutionTree() # To hold the resolution tree used to generate this problem
 
+        random.seed(84)
+
     def getTree(self):
         return self.resolution_tree
     
@@ -109,12 +111,16 @@ class LogicalProblem():
         return
 
     #main function to combine nodes into premises
-    def generatePremises(self):
+    def generatePremises(self, num_premises):
+        
+        random.seed(84)
+        self.premises = []
+        self.num_premises = num_premises
         elders = []
         for level in self.resolution_tree.tree_nodes:
             for node in level:
                 if node.getParent() == (-1,-1):
-                    elders.append(Premise([node]))
+                    elders.append(Premise([copy.deepcopy(node)]))
         # TODO: Negate premise
         while True:
             ind_sublist = random.sample(range(0,len(elders)), 2)
@@ -122,5 +128,4 @@ class LogicalProblem():
             elders.append(sublist)
             if len(elders) <= self.num_premises:
                 break
-        print(elders)
         self.premises = elders
