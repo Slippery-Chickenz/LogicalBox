@@ -1,6 +1,8 @@
 import random
 from Variable import Variable
 from ResolutionNode import ResolutionNode
+from Premise import Premise
+
 class Connector():
     '''
     class to encapsulate a logical statement defined as
@@ -18,48 +20,13 @@ class Connector():
 
 
     #takes in a list of clauses
-    def __init__(self, premise):
+    def __init__(self, premise, flag):
         self.str = ''
         self.connector = '|'
-        self.flag = 0
+        self.flag = flag
         self.left = []
         self.right = []
-        #if only given a single premise
-        if premise.getLength() == 1:
-            clause = premise.getClause(0)
-            #if an atom
-            if clause.isAtom():
-                self.connector = ' & '
-                self.left = clause.getVariables()[0]
-                self.right = clause.getVariables()[0]
-                #self.str = clause.getVariables()[0].stringVar() + self.connector + clause.getVariables()[0].stringVar()
-            #otherwise, randomly generate connector
-            '''
-            else:
-                vars = clause.getVariables()
-                num = random.randint(0, len(vars)-1)
-                left = ResolutionNode(vars[0:num], clause.getParent(), clause.child)
-                right = ResolutionNode(vars[num:], clause.getParent(), clause.child)
-
-                connector, flag = self.RNG()
-                self.connector = connector
-                self.flag = flag
-                if connector == '&':
-                    print("&")
-                    pass
-                    #demorg
-                elif connector == '-->':
-                    print("-->")
-                    #demorg LHS
-                    pass
-                else:
-                    print("|")
-
-                self.left = self.recursiveInit(left)
-                self.right = self.recursiveInit(right)
-            '''
-            self.left = self.recursiveInit(premise)
-            self.right = self.recursiveInit(premise)
+        self.recursiveInit(premise)
 
     def RNG(self):
         coin_flip = random.random()
@@ -81,61 +48,33 @@ class Connector():
             #if an atom
             if clause.isAtom():
                 return
-            '''
-            else:
-                vars = clause.getVariables()
-                left = []
-                right = []
-                if len(vars) == 2:
-                    left = ResolutionNode(vars[0], clause.getParent(), clause.child)
-                    right = ResolutionNode(vars[1], clause.getParent(), clause.child)
-                else:
-                    num = random.randint(0, len(vars)-1)
-                    left = ResolutionNode(vars[0:num], clause.getParent(), clause.child)
-                    right = ResolutionNode(vars[num:], clause.getParent(), clause.child)
 
-                connector, flag = self.RNG()
-                self.connector = connector
-                self.flag = flag
-                if connector == '&':
-                    print("&")
-                    pass
-                    #demorg
-                elif connector == '-->':
-                    print("-->")
-                    #demorg LHS
-                    pass
-                else:
-                    print("|")
-
-                self.left = self.recursiveInit(left)
-                self.right = self.recursiveInit(right)
-            '''    
         else:
-            if len(premise) == 1:
+            if premise.getLength() == 1:
                 left = []
                 right = []
-                if len(vars) == 2:
-                    left = ResolutionNode(vars[0], clause.getParent(), clause.child)
-                    right = ResolutionNode(vars[1], clause.getParent(), clause.child)
-                else:
-                    num = random.randint(0, len(vars)-1)
-                    left = ResolutionNode(vars[0:num], clause.getParent(), clause.child)
-                    right = ResolutionNode(vars[num:], clause.getParent(), clause.child)
-
-            num = random.randint(0, len(premise)-1)
-            print(num)
-            left = premise[0:num]
-            right = premise[num:]
+                clause = premise[0].getClause(0)
+                vars = clause.getVariables()
+                num = random.randint(1, len(vars)-1)
+                left = Premise([ResolutionNode(vars[0:num], clause.getParent(), clause.child)])
+                right = Premise[ResolutionNode(vars[num:], clause.getParent(), clause.child)]
+            else:
+                self.connector = '&'
+                num = random.randint(1, len(premise)-1)
+            #print(num)
+                left = premise[0:num]
+                right = premise[num:]
 
             connector, flag = self.RNG()
-            self.connector = connector
-            self.flag = flag
-            if connector.equals('|'):
-                pass
-                #demorg
-            elif connector.equals('-->'):
+
+            if self.connector == '|':
+                if flag == 0:
+                    self.flag = not self.flag
+            elif self.connector == '&':
+                if flag == 1:
+                    self.flag = not self.flag
+            elif self.connector == '-->':
                 #demorg LHS
                 pass
-            self.left = self.recursiveInit(left)
-            self.left = self.recursiveInit(right)
+            self.left = Connector(left)
+            self.left = Connector(right)
