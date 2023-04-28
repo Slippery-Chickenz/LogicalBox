@@ -59,3 +59,10 @@ Logical Box currently does not support biconditional generation
 Logical Box currently does not support variable distribution and DeMorgans expansion. It does, however, support double negation
 
 We hope that this project provides a good starting point for future expansion and robust logic problem generation.
+
+# Contributors
+Luke Dyer: 2023
+
+Kathryn Carbone: 2023
+
+Rom Simovitch: 2023
