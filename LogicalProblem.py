@@ -107,7 +107,10 @@ class LogicalProblem():
         #con = Connector(vara)
         nodea = ResolutionNode([vara,varb], (-1,-1), 0)
         nodeb = ResolutionNode([varc, vara], (-1,-1), 0)
-        premise = Premise([nodea, nodeb])
+        nodec = ResolutionNode([vara], (-1,-1), 0)
+        premise = Premise([nodea])
+        premise.generateConnector()
+        #premise.printPrem()
         #con = Connector([nodea, nodeb])
         return
 
@@ -127,3 +130,4 @@ class LogicalProblem():
                 break
         print(elders)
         self.premises = elders
+        self.generateConnectors()

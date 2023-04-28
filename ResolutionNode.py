@@ -23,6 +23,11 @@ class ResolutionNode():
     def invertVariables(self):
         for var in self.variables:
             var.negateVariable()
+
+    def isAtom(self):
+        if len(self.variables) == 1:
+            return True
+        return False
     
     def __eq__(self, other):
         if self.parent == other.parent and self.child == other.child:

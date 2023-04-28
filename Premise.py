@@ -10,7 +10,7 @@ class Premise():
     def __init__(self, clauses):
 
         self.clauses = clauses
-        self.connector
+        self.connector = 0
 
     def getLength(self):
         return len(self.clauses)
@@ -26,6 +26,9 @@ class Premise():
 
     def generateConnector(self):
         self.connector = Connector(self)
+
+    def printPrem(self):
+        self.connector.printCon()
 
     def negatePremise(self):
         for clause in self.clauses:
