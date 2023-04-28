@@ -37,6 +37,8 @@ class Main_Application():
         self.premise_input.grid(column = 3, row = 1, columnspan= 1, padx = 10, pady=10)
 
     def generatePremises(self):
+        if len(self.problems) == 0:
+            return
         self.problems[-1].generatePremises(int(self.premise_input.get()))
         self.drawPremises()
         return
@@ -195,9 +197,6 @@ class Main_Application():
 
         # Canvas to draw the tree onto
         self.canvas = Canvas(self.master, bg="SpringGreen2", width= 1200, height = 600)
-
-
-
 
     def draw(self):
         
