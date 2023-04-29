@@ -130,7 +130,10 @@ class Connector():
         self.left = Connector(left, left_flag)
         self.right = Connector(right, right_flag)
 
-        self.str = "" + self.left.getString() + self.connector + self.right.getString()
+        if self.connector == ">":
+            self.str = "(" + self.left.getString() + ")" + self.connector + "(" + self.right.getString() + ")"
+        else:
+            self.str = self.left.getString() + self.connector + self.right.getString()
         if self.flag:
             self.str = " " + self.str + " "
         else:

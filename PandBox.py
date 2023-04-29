@@ -174,7 +174,7 @@ class Main_Application():
         self.premise_frame.grid_columnconfigure(0, weight=1)
         #self.premise_frame.grid_propagate(False)
 
-        self.premise_canvas = Canvas(self.premise_frame, bg = "yellow", width=1200, height=300)
+        self.premise_canvas = Canvas(self.premise_frame, bg = "white", width=1200, height=300)
         self.premise_canvas.grid(row =0, column=0, sticky="news", columnspan=7)
 
         self.vsb = Scrollbar(self.premise_frame, orient='vertical', command=self.premise_canvas.yview)
